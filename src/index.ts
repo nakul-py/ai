@@ -21,17 +21,14 @@ import { IFormRendererRegistry } from '@jupyterlab/ui-components';
 import { ReadonlyPartialJSONObject } from '@lumino/coreutils';
 import { ISecretsManager, SecretsManager } from 'jupyter-secrets-manager';
 
-import {
-  ChatHandler,
-  welcomeMessage,
-  FileCommandProvider
-} from './chat-handler';
+import { ChatHandler, welcomeMessage } from './chat-handler';
 import { CompletionProvider } from './completion-provider';
 import { defaultProviderPlugins } from './default-providers';
 import { AIProviderRegistry } from './provider';
 import { aiSettingsRenderer, textArea } from './settings';
 import { IAIProviderRegistry, PLUGIN_IDS } from './tokens';
 import { stopItem } from './components/stop-button';
+import { attachItem } from './components/attach-button';
 
 const chatCommandRegistryPlugin: JupyterFrontEndPlugin<IChatCommandRegistry> = {
   id: PLUGIN_IDS.chatCommandRegistry,
@@ -41,7 +38,6 @@ const chatCommandRegistryPlugin: JupyterFrontEndPlugin<IChatCommandRegistry> = {
   activate: () => {
     const registry = new ChatCommandRegistry();
     registry.addProvider(new ChatHandler.ClearCommandProvider());
-    registry.addProvider(new FileCommandProvider());
     return registry;
   }
 };
@@ -115,6 +111,8 @@ const chatPlugin: JupyterFrontEndPlugin<void> = {
     let chatWidget: ReactWidget | null = null;
 
     const inputToolbarRegistry = InputToolbarRegistry.defaultToolbarRegistry();
+    const attachButton = attachItem();
+    inputToolbarRegistry.addItem('_attach', attachButton);
     const stopButton = stopItem(() => chatHandler.stopStreaming());
     inputToolbarRegistry.addItem('stop', stopButton);
 
